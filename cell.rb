@@ -1,0 +1,105 @@
+populations = [[0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1],
+ [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+ [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0],
+ [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0],
+ [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+ [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+ [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+ [0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1],
+ [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
+ [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+ [0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0],
+ [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0],
+ [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+ [0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+ [0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1]]
+
+
+populations_update = [[0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1],
+ [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+ [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0],
+ [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0],
+ [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+ [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+ [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+ [0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1],
+ [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
+ [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+ [0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0],
+ [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0],
+ [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+ [0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+ [0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1]]
+
+
+class Cell
+  attr_reader :populations, :populations_update, :x, :y
+
+  def initialize(populations, populations_update, x, y)
+    @populations = populations
+    @populations_update = populations_update
+    @x = x
+    @y = y
+    @live = false
+  end
+
+  def dead?
+    !@live
+  end
+
+  def live?
+    @live
+  end
+
+  def neighbours_coordinates(x, y)
+    neighbours = []
+    neighbours << [x - 1, y - 1]
+    neighbours << [x - 1, y]
+    neighbours << [x - 1, y + 1]
+
+    neighbours << [x, y - 1]
+    neighbours << [x, y + 1]
+
+    neighbours << [x + 1, y - 1]
+    neighbours << [x + 1, y]
+    neighbours << [x + 1, y + 1]
+  end
+
+  def neighbour_count(x, y)
+    neighbours_coordinates(x, y).select do |neighbour|
+      neighbour[0] >= 0 && neighbour[0] <= 15 && neighbour[1] >= 0 && neighbour[1] <= 15
+    end
+  end
+
+  def neighbour_alive(x, y)
+    sum_alive_neighbour = 0
+    neighbour_count(x, y).each do |coord|
+      if @populations[coord[0]][coord[1]] == 1
+        sum_alive_neighbour += 1
+      else
+      end
+    end
+    return sum_alive_neighbour
+  end
+
+  def change_statement
+    @populations.each_with_index do |population, x|
+      population.each_with_index do |value, y|
+        if value == 1 && neighbour_alive(x, y) < 2
+          @populations_update[x][y] = 0
+        elsif value == 1 && (neighbour_alive(x, y) == 2 || neighbour_alive(x, y) == 3)
+          populations_update[x][y] = 1
+        elsif neighbour_alive(x, y) > 3
+          populations_update[x][y] = 0
+        elsif value == 0 && neighbour_alive(x, y) == 3
+          populations_update[x][y] = 1
+        end
+      end
+    end
+    @populations_update
+  end
+end
+
+print Cell.new(populations, populations_update, 0, 0).change_statement
