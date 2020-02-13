@@ -98,7 +98,7 @@ class Cell
           end
         end
       end
-      @populations_update
+      p @populations_update
     end
   end
 
@@ -109,4 +109,4 @@ class Cell
   end
 end
 
-print Cell.new(populations, populations_update, 0, 0).game
+Cell.new(populations, populations_update, 0, 0).game
