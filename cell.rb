@@ -33,7 +33,6 @@ populations_update = [[0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
  [0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
  [0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1]]
 
-
 class Cell
   attr_reader :populations, :populations_update, :x, :y
 
@@ -84,22 +83,30 @@ class Cell
     return sum_alive_neighbour
   end
 
-  def change_statement
-    @populations.each_with_index do |population, x|
-      population.each_with_index do |value, y|
-        if value == 1 && neighbour_alive(x, y) < 2
-          @populations_update[x][y] = 0
-        elsif value == 1 && (neighbour_alive(x, y) == 2 || neighbour_alive(x, y) == 3)
-          populations_update[x][y] = 1
-        elsif neighbour_alive(x, y) > 3
-          populations_update[x][y] = 0
-        elsif value == 0 && neighbour_alive(x, y) == 3
-          populations_update[x][y] = 1
+  def change_statement(iterator)
+    iterator.times do
+      @populations.each_with_index do |population, x|
+        population.each_with_index do |value, y|
+          if value == 1 && neighbour_alive(x, y) < 2
+            @populations_update[x][y] = 0
+          elsif value == 1 && (neighbour_alive(x, y) == 2 || neighbour_alive(x, y) == 3)
+            populations_update[x][y] = 1
+          elsif neighbour_alive(x, y) > 3
+            populations_update[x][y] = 0
+          elsif value.zero? && neighbour_alive(x, y) == 3
+            populations_update[x][y] = 1
+          end
         end
       end
+      @populations_update
     end
-    @populations_update
+  end
+
+  def game
+    puts "How many generation you want ?"
+    iterator = gets.chomp.to_i
+    change_statement(iterator)
   end
 end
 
-print Cell.new(populations, populations_update, 0, 0).change_statement
+print Cell.new(populations, populations_update, 0, 0).game
